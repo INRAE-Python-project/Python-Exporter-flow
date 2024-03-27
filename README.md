@@ -10,31 +10,38 @@ L'application lance une surveillance réseau sur les interfaces sélectionnées 
 
 ## Prérequis
 
-- Posséder les droits d'administrateur sur la machine.
-- Python 3.11
-- Bibliotheques Python : `os`, `sys`, `threading`, `scapy`, `datetime`, `multiprocessing`, `keyboard`.
+- Être administrateur sur la machine cible.
+- Système d'exploitation : Ubuntu (version native, non WSL).
 
-## Installation
+## Installation et lancement
 
-- Installez Python 3.11 si ce n'est pas déjà fait.
-- Installez la bibliothèque Scapy en utilisant pip : `pip install scapy` sur windows sinon `sudo pip install scapy --break-system-packages` sur une distribution linux.
-- Installez la bibliothèque Keyboard : `pip install keyboard` sur windows sinon `sudo pip install keyboard --break-system-packages` sur linux.
-- Clonez ou téléchargez le script de l'application depuis son dépôt.
+### Utilisation du Script d'Initialisation
 
-## Lancement du script
+Pour faciliter l'installation de Python, des dépendances nécessaires et du lancement de l'application, un script d'initialisation init.sh est fourni. Pour l'utiliser :
 
-- Ouvrez un terminal ou une invite de commande.
-- Naviguez jusqu'au dossier contenant le script.
-- Lancez le script en utilisant la commande : python exporter-flow.py.
-- Suivez les instructions à l'écran pour sélectionner les interfaces à surveiller et spécifier le chemin pour les fichiers de log.
-- Une fois la surveillance démarrée, vous pouvez la terminer à tout moment en appuyant sur la touche 'z'.
+1. Ouvrez un terminal
+2. Naviguez jusqu'au dossier contenant le script `init.sh`.
+3. Assurez-vous que le script a les droits d'exécution. Si nécessaire, accordez ces droits en exécutant : ``chmod +x init.sh``
+4. Lancez le script d'initialisation en administrateur : ``sudo ./init.sh``
 
-## Aide
+Ce script s'occupera d'installer Python 3.11 (si ce n'est pas déjà fait), ainsi que toutes les bibliothèques nécessaires. Ensuite, il lancera automatiquement l'application.
 
-Pour vous aidez à installer python et les dépendances, vous pouvez exécuter le script "init.sh" qui est à la racine du projet
-qui va installer python et les dépendances nécessaires, pensez juste à donner les droits d'execution sur le script.
+## Sélection des Interfaces et Chemin des Logs
 
-### Exécution du script d'initialisation
+- Une fois le script lancé, suivez les instructions affichées pour sélectionner les interfaces réseau à surveiller.
+
+- Spécifiez le chemin où vous souhaitez stocker les fichiers de logs. Si vous laissez cette option vide, un dossier par défaut sera utilisé.
+
+## Arrêt de la Surveillance
+
+- Pour arrêter la surveillance, suivez la procédure indiquée dans le terminal (généralement, cela implique d'appuyer sur une touche spécifique).
+
+## Aide et Support
+
+En cas de difficulté ou pour toute question, veuillez vous référer à cette documentation ou contacter l'auteur.
+
+
+
 
 
 

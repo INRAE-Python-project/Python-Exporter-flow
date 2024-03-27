@@ -1,14 +1,10 @@
 import os
 import sys
 from threading import Timer, Thread
-from scapy.all import sniff, get_if_list
+from scapy.all import sniff, get_if_list, IP, TCP, UDP
 from datetime import datetime
-from multiprocessing import Process
-import keyboard
-
-# Variables globales pour les processus et les timers
-processus = []
-timers = []
+import json
+import keyboard  # Assurez-vous que la bibliothèque keyboard est installée
 
 def afficher_interfaces():
     print("Interfaces réseau disponibles:")
@@ -19,49 +15,43 @@ def choisir_interfaces():
     interfaces = input("Entrez les interfaces à surveiller (séparées par une virgule): ")
     interfaces_saisies = [intf.strip() for intf in interfaces.split(",")]
     interfaces_valides = []
-
     for interface in interfaces_saisies:
         if interface in get_if_list():
             interfaces_valides.append(interface)
         else:
             print(f"L'interface : {interface} n'existe pas.")
-
     return interfaces_valides
 
 def generer_chemin_log(interface, log_dossier_base):
     now = datetime.now()
-    nom_fichier = f"{interface}-log-{now.strftime('%Y-%m-%d-%H-%M')}.txt"
+    nom_fichier = f"{interface}-netflow-{now.strftime('%Y-%m-%d-%H-%M')}.json"
     dossier_interface = os.path.join(log_dossier_base, interface)
     if not os.path.exists(dossier_interface):
         os.makedirs(dossier_interface)
     return os.path.join(dossier_interface, nom_fichier)
 
 def traiter_paquet(paquet, log_path):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(log_path, "a") as f:
-        f.write(f"{timestamp} - Paquet capturé: {paquet.summary()}\n")
+    if IP in paquet:
+        flux_info = {
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'src_ip': paquet[IP].src,
+            'dst_ip': paquet[IP].dst,
+            'src_port': paquet[TCP].sport if TCP in paquet else paquet[UDP].sport if UDP in paquet else None,
+            'dst_port': paquet[TCP].dport if TCP in paquet else paquet[UDP].dport if UDP in paquet else None,
+            'protocol': paquet.sprintf("%IP.proto%"),
+            'length': len(paquet)
+        }
+        with open(log_path, "a") as log_file:
+            log_file.write(json.dumps(flux_info) + "\n")
 
-def changer_log(interface, log_dossier_base):
+def demarrer_surveillance(interface, log_dossier_base):
     log_path = generer_chemin_log(interface, log_dossier_base)
-    timer = Timer(300, changer_log, args=(interface, log_dossier_base))
-    timer.start()
-    timers.append(timer)
-    return log_path
-
-def demarrer_surveillance(interface, dossier_base):
-    log_path = changer_log(interface, dossier_base)
     print(f"Surveillance de l'interface {interface} démarrée...")
     sniff(iface=interface, prn=lambda paquet: traiter_paquet(paquet, log_path), store=False)
 
-def ecouter_stop():
-    print("\nAppuyez sur 'z' pour arrêter le script proprement.")
-    keyboard.wait('z')
-    print("\nArrêt de tous les processus de surveillance...")
-    for timer in timers:
-        timer.cancel()
-    for p in processus:
-        p.terminate()
-    sys.exit(0)
+def stop_surveillance():
+    print("\nArrêt de la surveillance des interfaces...")
+    os._exit(0)  # Arrête tous les threads et termine le programme
 
 def main():
     afficher_interfaces()
@@ -69,19 +59,22 @@ def main():
 
     log_dossier_base = input("Entrez le chemin absolu pour stocker les dossiers de logs (laissez vide pour le répertoire par défaut): ")
     if not log_dossier_base:
-        log_dossier_base = "./folder-log"
+        log_dossier_base = "./netflow-logs"
         if not os.path.exists(log_dossier_base):
             os.mkdir(log_dossier_base)
 
-    stop_listener = Thread(target=ecouter_stop)
-    stop_listener.start()
+    surveillance_threads = []
     for interface in interfaces:
-        p = Process(target=demarrer_surveillance, args=(interface, log_dossier_base))
-        processus.append(p)
-        p.start()
+        t = Thread(target=demarrer_surveillance, args=(interface, log_dossier_base))
+        t.start()
+        surveillance_threads.append(t)
 
-    for p in processus:
-        p.join()
+    print("\nAppuyez sur 'q' pour arrêter la surveillance.")
+    keyboard.wait('q')
+    stop_surveillance()
+
+    for t in surveillance_threads:
+        t.join()
 
 if __name__ == "__main__":
     main()
