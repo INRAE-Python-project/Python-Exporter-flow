@@ -1,18 +1,20 @@
 import os
-import signal
 import sys
-from threading import Timer
+from threading import Timer, Thread
 from scapy.all import sniff, get_if_list
 from datetime import datetime
-from multiprocessing import Process, current_process
+from multiprocessing import Process
+import keyboard  # Nécessite 'pip install keyboard'
 
-# Affiche toutes les interfaces réseau disponibles
+# Variables globales pour les processus et les timers
+processus = []
+timers = []
+
 def afficher_interfaces():
     print("Interfaces réseau disponibles:")
     for interface in get_if_list():
         print(f"- {interface}")
 
-# Demande à l'utilisateur de choisir les interfaces à surveiller
 def choisir_interfaces():
     interfaces = input("Entrez les interfaces à surveiller (séparées par une virgule): ")
     interfaces_saisies = [intf.strip() for intf in interfaces.split(",")]
@@ -26,7 +28,6 @@ def choisir_interfaces():
 
     return interfaces_valides
 
-# Générer le chemin du fichier log basé sur l'heure actuelle
 def generer_chemin_log(interface, log_dossier_base):
     now = datetime.now()
     nom_fichier = f"{interface}-log-{now.strftime('%Y-%m-%d-%H-%M')}.txt"
@@ -35,41 +36,34 @@ def generer_chemin_log(interface, log_dossier_base):
         os.makedirs(dossier_interface)
     return os.path.join(dossier_interface, nom_fichier)
 
-# Fonction de callback pour le traitement de chaque paquet capturé
-def traiter_paquet(paquet):
-    global log_path
+def traiter_paquet(paquet, log_path):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_path, "a") as f:
         f.write(f"{timestamp} - Paquet capturé: {paquet.summary()}\n")
 
-# Fonction pour changer le fichier de log toutes les 5 minutes
-def changer_log():
-    global log_path
-    log_path = generer_chemin_log(current_interface, log_dossier_base)
-    Timer(300, changer_log).start()  # Réinitialiser le timer toutes les 5 minutes
-
-# Fonction pour démarrer la capture de paquets sur une interface
-def demarrer_surveillance(interface, dossier_base):
-    global log_dossier_base, current_interface, log_path
-    log_dossier_base = dossier_base
-    current_interface = interface
+def changer_log(interface, log_dossier_base):
     log_path = generer_chemin_log(interface, log_dossier_base)
-    changer_log()  # Initialise le premier fichier de log et le timer
-    print(f"Surveillance de l'interface {interface} démarrée...")
-    sniff(iface=interface, prn=traiter_paquet, store=False)
+    timer = Timer(300, changer_log, args=(interface, log_dossier_base))
+    timer.start()
+    timers.append(timer)
+    return log_path
 
-# Fonction pour gérer l'interruption du programme principal
-def signal_handler(sig, frame):
-    print("Arrêt de tous les processus de surveillance...")
+def demarrer_surveillance(interface, dossier_base):
+    log_path = changer_log(interface, dossier_base)
+    print(f"Surveillance de l'interface {interface} démarrée...")
+    sniff(iface=interface, prn=lambda paquet: traiter_paquet(paquet, log_path), store=False)
+
+def ecouter_stop():
+    print("\nAppuyez sur 'z' pour arrêter le script proprement.")
+    keyboard.wait('z')
+    print("\nArrêt de tous les processus de surveillance...")
+    for timer in timers:
+        timer.cancel()
     for p in processus:
         p.terminate()
     sys.exit(0)
 
-# Programme principal
 def main():
-    global processus
-    processus = []
-
     afficher_interfaces()
     interfaces = choisir_interfaces()
 
@@ -79,12 +73,15 @@ def main():
         if not os.path.exists(log_dossier_base):
             os.mkdir(log_dossier_base)
 
-    signal.signal(signal.SIGINT, signal_handler)
 
+    stop_listener = Thread(target=ecouter_stop)
+    stop_listener.start()
     for interface in interfaces:
         p = Process(target=demarrer_surveillance, args=(interface, log_dossier_base))
         processus.append(p)
         p.start()
+
+
 
     for p in processus:
         p.join()
