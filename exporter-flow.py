@@ -4,7 +4,7 @@ from threading import Timer, Thread
 from scapy.all import sniff, get_if_list
 from datetime import datetime
 from multiprocessing import Process
-import keyboard  # Nécessite 'pip install keyboard'
+import keyboard
 
 # Variables globales pour les processus et les timers
 processus = []
@@ -73,15 +73,12 @@ def main():
         if not os.path.exists(log_dossier_base):
             os.mkdir(log_dossier_base)
 
-
     stop_listener = Thread(target=ecouter_stop)
     stop_listener.start()
     for interface in interfaces:
         p = Process(target=demarrer_surveillance, args=(interface, log_dossier_base))
         processus.append(p)
         p.start()
-
-
 
     for p in processus:
         p.join()
