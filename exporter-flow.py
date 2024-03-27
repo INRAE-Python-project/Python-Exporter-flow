@@ -16,7 +16,7 @@ def choisir_interfaces():
     return interfaces_choisies
 
 # Fonction de callback pour le traitement de chaque paquet capturé
-def traiter_paquet(paquet):
+def traiter_paquet(paquet, log_path):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_path, "a") as f:
         # Ici, vous pourriez formater les données capturées de manière similaire à NetFlow
@@ -33,26 +33,22 @@ def demander_chemin_log():
 
 # Programme principal
 def main():
-
     afficher_interfaces()
     interfaces = choisir_interfaces()
 
-    """
     log_dossier = demander_chemin_log()
     log_path = os.path.join(log_dossier, "netflow_log.txt")
 
     try:
         for interface in interfaces:
             print(f"Surveillance de l'interface {interface}...")
-            # La fonction sniff de Scapy est bloquante, envisagez d'exécuter chaque capture dans son propre thread pour les interfaces multiples
-            sniff(iface=interface, prn=traiter_paquet, store=False)
+            # Modifier sniff pour passer log_path à traiter_paquet
+            sniff(iface=interface, prn=lambda x: traiter_paquet(x, log_path), store=False)
     except KeyboardInterrupt:
         print("Arrêt de la capture de paquets.")
     except Exception as e:
         print(f"Erreur: {e}")
         sys.exit(1)
-    """
 
 if __name__ == "__main__":
     main()
-
