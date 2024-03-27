@@ -17,15 +17,15 @@ L'application lance une surveillance réseau sur les interfaces sélectionnées 
 ## Installation
 
 - Installez Python 3.11 si ce n'est pas déjà fait.
-- Installez la bibliothèque Scapy en utilisant pip : `pip install scapy` sur windows sinon `pip install scapy --break-system-packages` sur une distribution linux.
-- Installez la bibliothèque Keyboard : `pip install keyboard` sur windows sinon `pip install keyboard --break-system-packages` sur linux.
+- Installez la bibliothèque Scapy en utilisant pip : `pip install scapy` sur windows sinon `sudo pip install scapy --break-system-packages` sur une distribution linux.
+- Installez la bibliothèque Keyboard : `pip install keyboard` sur windows sinon `sudo pip install keyboard --break-system-packages` sur linux.
 - Clonez ou téléchargez le script de l'application depuis son dépôt.
 
 ## Lancement du script
 
 - Ouvrez un terminal ou une invite de commande.
 - Naviguez jusqu'au dossier contenant le script.
-- Lancez le script en utilisant la commande : python <nom_du_script>.py.
+- Lancez le script en utilisant la commande : python exporter-flow.py.
 - Suivez les instructions à l'écran pour sélectionner les interfaces à surveiller et spécifier le chemin pour les fichiers de log.
 - Une fois la surveillance démarrée, vous pouvez la terminer à tout moment en appuyant sur la touche 'z'.
 
