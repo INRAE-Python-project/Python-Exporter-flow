@@ -32,7 +32,7 @@ L'application lance une surveillance réseau sur les interfaces sélectionnées 
 ## Aide
 
 Pour vous aidez à installer python et les dépendances, vous pouvez exécuter le script "init.sh" qui est à la racine du projet
-qui va installer python et les dépendances nécessaires.
+qui va installer python et les dépendances nécessaires, pensez juste à donner les droits d'execution sur le script.
 
 ### Exécution du script d'initialisation
 
