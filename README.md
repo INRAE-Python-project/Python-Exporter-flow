@@ -39,7 +39,7 @@ Pour faciliter l'installation de Python, des dépendances nécessaires et du lan
 
 1. Ouvrez un terminal
 2. Naviguez jusqu'au dossier contenant le script `init.sh`.
-3. Assurez-vous que le script a les droits d'exécution. Si nécessaire, accordez ces droits en exécutant : ``chmod +x init.sh``
+3. Assurez-vous que le script a les droits d'exécution. Si nécessaire, accordez ces droits en exécutant : ``sudo chmod +x init.sh``
 4. Lancez le script d'initialisation en administrateur : ``sudo ./init.sh``
 
 Ce script s'occupera d'installer Python 3.11 (si ce n'est pas déjà fait), ainsi que toutes les bibliothèques nécessaires. Ensuite, il lancera automatiquement l'application.
