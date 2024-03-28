@@ -6,7 +6,7 @@ Cette application vise à simuler la fonctionnalité d'un exportateur NetFlow en
 
 ## Fonctionnement
 
-L'application lance une surveillance réseau sur les interfaces sélectionnées par l'utilisateur. Pour chaque interface, elle crée des fichiers de log dans un dossier spécifié (ou un dossier par défaut si aucun chemin n'est donné) avec une rotation toutes les 5 minutes pour éviter la surcharge des fichiers uniques. Les utilisateurs peuvent arrêter la surveillance en appuyant sur la touche 'z', ce qui termine proprement tous les processus et threads en cours d'exécution.
+L'application lance une surveillance réseau sur les interfaces sélectionnées par l'utilisateur. Pour chaque interface, elle crée des fichiers de log dans un dossier spécifié (ou un dossier par défaut si aucun chemin n'est donné) avec une rotation toutes les 5 minutes pour éviter la surcharge des fichiers uniques. Les utilisateurs peuvent arrêter la surveillance en appuyant sur la touche 'q', ce qui termine proprement tous les processus et threads en cours d'exécution.
 
 ## Liste des actions du script
 
