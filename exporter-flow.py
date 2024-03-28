@@ -6,11 +6,13 @@ from datetime import datetime
 import json
 import keyboard  # Assurez-vous que la bibliothèque keyboard est installée
 
+# Cette fonction affiche les interfaces réseau disponibles
 def afficher_interfaces():
     print("Interfaces réseau disponibles:")
     for interface in get_if_list():
         print(f"- {interface}")
 
+# Cette fonction permet à l'utilisateur de choisir les interfaces à surveiller
 def choisir_interfaces():
     interfaces = input("Entrez les interfaces à surveiller (séparées par une virgule): ")
     interfaces_saisies = [intf.strip() for intf in interfaces.split(",")]
@@ -22,6 +24,7 @@ def choisir_interfaces():
             print(f"L'interface : {interface} n'existe pas.")
     return interfaces_valides
 
+# Cette fonction génère le chemin du fichier de log
 def generer_chemin_log(interface, log_dossier_base):
     now = datetime.now()
     nom_fichier = f"{interface}-netflow-{now.strftime('%Y-%m-%d-%H-%M')}.json"
@@ -30,6 +33,7 @@ def generer_chemin_log(interface, log_dossier_base):
         os.makedirs(dossier_interface)
     return os.path.join(dossier_interface, nom_fichier)
 
+# Cette fonction traite les paquets capturés et les écrit dans un fichier de log
 def traiter_paquet(paquet, log_path):
     if IP in paquet:
         flux_info = {
@@ -44,11 +48,13 @@ def traiter_paquet(paquet, log_path):
         with open(log_path, "a") as log_file:
             log_file.write(json.dumps(flux_info) + "\n")
 
+# Cette fonction démarre la surveillance de l'interface spécifiée
 def demarrer_surveillance(interface, log_dossier_base):
     log_path = generer_chemin_log(interface, log_dossier_base)
     print(f"Surveillance de l'interface {interface} démarrée...")
     sniff(iface=interface, prn=lambda paquet: traiter_paquet(paquet, log_path), store=False)
 
+# Cette fonction arrête la surveillance des interfaces
 def stop_surveillance():
     print("\nArrêt de la surveillance des interfaces...")
     os._exit(0)  # Arrête tous les threads et termine le programme
