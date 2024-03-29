@@ -45,8 +45,22 @@ def traiter_paquet(paquet, log_path):
             'protocol': paquet.sprintf("%IP.proto%"),
             'length': len(paquet)
         }
+
+        # Extraire et enregistrer les flags TCP si le paquet est un paquet TCP
+        if TCP in paquet:
+            flags = paquet[TCP].flags
+            flag_str = ''
+            if flags & 0x01: flag_str += 'F'
+            if flags & 0x02: flag_str += 'S'
+            if flags & 0x04: flag_str += 'R'
+            if flags & 0x08: flag_str += 'P'
+            if flags & 0x10: flag_str += 'A'
+            if flags & 0x20: flag_str += 'U'
+            flux_info['tcp_flags'] = flag_str
+
         with open(log_path, "a") as log_file:
             log_file.write(json.dumps(flux_info) + "\n")
+
 
 # Cette fonction démarre la surveillance de l'interface spécifiée
 def demarrer_surveillance(interface, log_dossier_base):
