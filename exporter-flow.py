@@ -27,7 +27,7 @@ def choisir_interfaces():
 # Cette fonction génère le chemin du fichier de log
 def generer_chemin_log(interface, log_dossier_base):
     now = datetime.now()
-    nom_fichier = f"{interface}-netflow-{now.strftime('%Y-%m-%d-%H-%M')}.json"
+    nom_fichier = f"{interface}-netflow-{now.strftime('%d-%m-%Y-%H-%M')}.json"
     dossier_interface = os.path.join(log_dossier_base, interface)
     if not os.path.exists(dossier_interface):
         os.makedirs(dossier_interface)
